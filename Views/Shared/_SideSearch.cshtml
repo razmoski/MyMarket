@@ -1,0 +1,40 @@
+﻿<div class="wrapper">
+    <!-- Sidebar Holder -->
+    <nav id="sidebar">
+        <div class="sidebar-header">
+            <h4> Filter Products by</h4>
+        </div>
+        <br>
+        
+        <ul class="list-unstyled components">
+
+            <li class="active">
+
+                @Html.Label("Colour")
+                @Html.DropDownList("Colour", new SelectList(Enum.GetValues(typeof(SellMyStuff.Enums.Colour))), "Please Select Colour", new { @class = "form-control", id = "Colour" })
+
+            </li>
+            <br />
+
+            <li class="active">
+                @Html.Label("Price Up To")
+                @Html.Editor("Price", new { htmlAttributes = new { @class = "form-control", id = "Price", name = "Price" } })
+
+            </li>
+        </ul>
+    </nav>
+
+    <div class="col-md-12 col-sm-12">
+        <div class="col-md-6 col-sm-6 col-xs-6">
+            <button type="submit" class="btn btn-primary" onclick="FilterProducts()">
+                <text id="Search">Submit</text>
+            </button>
+        </div>
+        
+        <div class="col-md-6 col-sm-6 col-xs-6">
+            <button type="submit" class="btn btn-primary" onclick="ResetFilters()">
+                <text id="ResetFilters">Reset</text>
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,139 @@
+﻿@model SellMyStuff.Models.Article
+
+@using (Html.BeginForm("Edit", "Articles", null, FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        <h4>Article</h4>
+        <hr />
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.ArticlesGroupId, "ArticlesGroupId", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.DropDownList("ArticlesGroupId", null, htmlAttributes: new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.ArticlesGroupId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Description, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Description, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.StockQty, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.StockQty, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.StockQty, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        
+
+        <div class="form-group">
+
+            <label class="control-label col-md-2">Add Photos</label>
+            <div class="col-md-10" id='filecontainer'>
+
+                <input type='file' class="dimmy" id="image-input" name="files[]" multiple="multiple" />
+
+            </div>
+        </div>
+
+        <div class="form-group">
+
+            <label class="control-label col-md-2"></label>
+            <div class="preview-area col-md-10 "></div>
+            
+        </div>        
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-default" />
+            </div>
+        </div>
+
+    </div>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>
+
+@section scripts{
+    
+    <script>
+
+        // Load and Preview Multiple Images
+        var inputLocalFont = document.getElementById("image-input");
+        inputLocalFont.addEventListener("change", previewImages, false);
+
+        function previewImages() {
+            var fileList = this.files;
+
+            var anyWindow = window.URL || window.webkitURL;
+
+            for (var i = 0; i < fileList.length; i++) {
+                var objectUrl = anyWindow.createObjectURL(fileList[i]);
+                $('.preview-area').append('<img src="' + objectUrl + '" />');
+                window.URL.revokeObjectURL(fileList[i]);
+            }
+
+            $(inputLocalFont).hide();
+            inputLocalFont = $('<input type="file" class="dimmy" multiple />').appendTo("#filecontainer").get(0);
+            inputLocalFont.addEventListener("change", previewImages, false);
+        }
+
+        // Upload Multiple Images, used later in Controller
+        $(function () {
+            $('#image-input').fileupload({
+                dataType: 'json',
+                done: function (e, data) {
+                    $.each(data.result.files, function (index, file) {
+                        $('<p/>').text(file.name).appendTo(document.body);
+                    });
+                }
+            });
+        });
+
+        $('.deleteItem').click(function (e) {
+           e.preventDefault();
+           var $ctrl = $(this);
+
+           if (confirm('Do you really want to delete this file?')) {
+               $.ajax({
+                   url: '@Url.Action("DeletePhoto")',
+                   type: 'POST',
+                   data: { id: $(this).data('id') }
+               }).done(function (data) {
+                   if (data.Result == "OK") {
+                       $ctrl.closest('div').remove();
+                   }
+                   else if (data.Result.Message) {
+                       alert(data.Result.Message);
+                   }
+               }).fail(function () {
+                   alert("There is something wrong. Please try again.");
+               })
+           }
+       });
+
+
+
+    </script>
+}

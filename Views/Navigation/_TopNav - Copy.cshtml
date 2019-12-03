@@ -1,0 +1,68 @@
+﻿@model IEnumerable<SellMyStuff.Models.NavbarItem>
+
+<div class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            @Html.ActionLink("Home", "Index", "Home", new { area = "" }, new { @class = "navbar-brand" })
+        </div>
+
+           
+        <div class="navbar-collapse collapse">
+            
+            <ul class="nav navbar-nav">
+
+                @foreach (var item in Model)
+                {
+                    if (item.isParent && item.parentId == -1)
+                    {
+                        var childItems = Model.Where(p => p.parentId == item.Id).ToList();
+
+                        <li class="dropdown">
+
+                            <a class="dropdown-toggle" data-toggle="dropdown" href="@Url.Action(item.action,item.controller)">
+                                @item.nameOption
+                                <span class="caret"></span>
+                            </a>
+
+                            <ul class="dropdown-menu">
+
+                                @foreach (var ch in childItems)
+                                {
+                                    <li>
+                                        <a class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" href="@Url.Action(ch.action,ch.controller,new { id = ch.Id })">
+                                            @ch.nameOption
+                                        </a>
+
+                                        <ul>
+
+                                            @foreach (var secondItem in (Model.Where(s => s.parentId == ch.Id).ToList()))
+                                            {
+                                            <li>
+                                                <a href="@Url.Action(secondItem.action,secondItem.controller,new { id = secondItem.Id })">@secondItem.nameOption</a>
+                                            </li>
+                                            }
+                                            
+                                        </ul>
+                                    </li>                                   
+                                }
+
+                            </ul>
+                        </li>
+                    }
+                }
+                
+                <li>@Html.ActionLink("Categories", "Index", "ArticlesGroups")</li>
+                <li>@Html.ActionLink("Products", "Index", "Articles")</li>
+            </ul>
+            @Html.Partial("_LoginPartial")
+        </div>
+    </div>
+</div>
+
+
